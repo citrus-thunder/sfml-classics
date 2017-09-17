@@ -10,6 +10,7 @@ int field[M][N] = {0};
 struct Point
 {int x,y;} a[4], b[4];
 
+//Defines shapes as a 2-column grid numbered left>right top>bottom
 int figures[7][4] =
 {
     1,3,5,7, //I
@@ -49,8 +50,8 @@ int main()
     t2.loadFromFile("images/background.png");
     t3.loadFromFile("images/frame.png");
 
-    Sprite s(t1), background(t2), fame(t3);
-    s.setTextureRect(IntRect(0,0,18,18));
+    Sprite s(t1), background(t2), frame(t3);
+    
 
     int dx=0; bool rotate=0; int colorNum=1;
     float timer=0,delay=0.3;
@@ -156,7 +157,7 @@ int main()
         for(int i=M-1;i>0;i--)
         {
             int count=0;
-            for(int j=0;k<n;j++)
+            for(int j=0;j<N;j++)
             {
                 if(field[i][j])
                 {
@@ -186,7 +187,7 @@ int main()
                 }
                 s.setTextureRect(IntRect(field[i][j]*18,0,18,18));
                 s.setPosition(j*18,i*18);
-                s.move(28.31);
+                s.move(28,31);
                 window.draw(s);
             }
         }
