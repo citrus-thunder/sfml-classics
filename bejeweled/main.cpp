@@ -55,7 +55,7 @@ int main()
                 app.close();
 			   	
 			if (e.type == Event::MouseButtonPressed)
-				if (e.key.code == Mouse::Left)
+				if (Mouse::isButtonPressed(Mouse::Left))
 				{
 				   if (!isSwap && !isMoving) click++;
 				   pos = Mouse::getPosition(app)-offset;
