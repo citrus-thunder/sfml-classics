@@ -1,6 +1,12 @@
 #include <SFML/Graphics.hpp>
 #include <time.h>
 #include <iostream>
+#include <vector>
+#include <string>
+
+using std::string;
+using std::vector;
+
 using namespace sf;
 
 int tileSize = 32;
@@ -9,7 +15,7 @@ const int tileCountW = 13;
 
 const int tileCountH = 15;
 
-//int grid[tileCountW][tileCountH]={0};
+int grid[tileCountW][tileCountH]={0};
 
 int windowWidth = tileCountW * tileSize;
 int windowHeight = tileCountH * tileSize;
@@ -21,20 +27,57 @@ struct TestReporter{
 };
 
 struct Position{
+    Position(){};
     Position(int xpos,int ypos){
         x = xpos;
         y = ypos;
     }
+    void Update(int xpos, int ypos){
+        if(grid[xpos][ypos]>0){
+            grid[xpos][ypos] -= 1;
+        } else {
+
+        }
+    }
+    string Print(){
+        return "";
+    }
     int x, y;
 };
 
+class GameEntity{
+    public:
+        GameEntity();
+
+        GameEntity(string name, int position[2]){
+            mName = name;
+            Position mPosition(position[0],position[1]);
+        }
+
+        virtual ~GameEntity()=0;
+
+    void GetName(){
+
+    }
+
+    Position getPosition(){
+        return mPosition;
+    }
+    private:
+        string mName;
+        Position mPosition;
+};
+
+
+/*  At this point in time, this is simply a one-for-one container for Position, and isn't really necessary.
+*   Keeping for now.
 struct Vehicle{
     Vehicle(Position* pos){
         mPos = pos;
     }
     Position* mPos;
 };
-
+*/
 int main(){
     Position playerPosition(5,14);               //Set Start Position
     TestReporter testLog;
