@@ -1,8 +1,13 @@
+/** main.cpp
+ * Main script for Frogger clone
+ * Contains all class definitions and implementation
+**/
 #include <SFML/Graphics.hpp>
 #include <time.h>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
 
 using std::string;
 using std::vector;
@@ -20,10 +25,12 @@ int grid[tileCountW][tileCountH]={0};
 int windowWidth = tileCountW * tileSize;
 int windowHeight = tileCountH * tileSize;
 
-bool testMode = false;
+//bool testMode = false;
 
 struct TestReporter{
     bool reportPosition = true;
+    bool reportCollision = true;
+    bool reportNonCollision = true;
 };
 
 struct Position{
@@ -40,52 +47,81 @@ struct Position{
         }
     }
     string Print(){
-        return "";
+        std::stringstream ss;
+        ss << "[" << x << "," << y << "]";
+        return ss.str();
     }
     int x, y;
 };
 
 class GameEntity{
     public:
-        GameEntity();
+        GameEntity(){};
 
-        GameEntity(string name, int position[2]){
+        GameEntity(string name, int position[2], Texture* tex){
             mName = name;
-            Position mPosition(position[0],position[1]);
+            mPosition=Position(position[0],position[1]);
+            mSprite = Sprite(*tex);
         }
 
-        virtual ~GameEntity()=0;
-
-    void GetName(){
-
+    string getName(){
+        return mName;
+    }
+    void setName(string n){
+        mName = n;
     }
 
-    Position getPosition(){
-        return mPosition;
+    bool checkCollision(GameEntity* target){
+        return mSprite.getGlobalBounds().intersects(target->getSprite()->getGlobalBounds());
     }
+
+    Position* getPosition(){
+        return &mPosition;
+    }
+
+    void setPosition(int arr[2]){
+        mPosition.x = arr[0];
+        mPosition.y = arr[1];
+    }
+
+    Sprite* getSprite(){
+        return &mSprite; 
+    }
+
+    void setSprite(Sprite s){
+        mSprite = s;
+    }
+
     private:
         string mName;
         Position mPosition;
+        Sprite mSprite;
 };
 
-
-/*  At this point in time, this is simply a one-for-one container for Position, and isn't really necessary.
-*   Keeping for now.
-struct Vehicle{
-    Vehicle(Position* pos){
-        mPos = pos;
-    }
-    Position* mPos;
+class Enemy : public GameEntity{
+    public:
+        Enemy():GameEntity(){}
+        Enemy(string name, int pos[2], Texture* tex):GameEntity(name,pos,tex){}
+        bool activeThreat = true;
 };
-*/
+
 int main(){
-    Position playerPosition(5,14);               //Set Start Position
-    TestReporter testLog;
-    Texture fTexture;
-    fTexture.loadFromFile("images/frog.png");
 
-    Sprite fSprite(fTexture);
-    fSprite.setPosition(playerPosition.x * tileSize,playerPosition.y * tileSize);
+    TestReporter testLog;
+    int startPosition[2]{6,14};
+    Texture pTexture;
+    pTexture.loadFromFile("images/frog.png");
+    GameEntity Player("Player",startPosition,&pTexture);
+
+    Position* playerPosition = Player.getPosition();
+    Sprite* pSprite = Player.getSprite();
+
+    int ePosition[2]{6,8};
+    string enemyName = "enemy";
+    Enemy enemy(enemyName,ePosition,&pTexture);
+    Position* enemyPosition = enemy.getPosition();
+    Sprite* eSprite = enemy.getSprite();
+    
 
     RenderWindow window(VideoMode(windowWidth,windowHeight),"Totally Not That Other Frog Game");
     while(window.isOpen()){
@@ -101,32 +137,39 @@ int main(){
                 case Event::KeyReleased:
                     switch(e.key.code){
                         case Keyboard::Left: 
-                            if(playerPosition.x >= 1) moveX=-1;
+                            if(playerPosition->x >= 1) moveX=-1;
                             break;
                         case Keyboard::Right: 
-                            if(playerPosition.x < tileCountW-1) moveX=1;
+                            if(playerPosition->x < tileCountW-1) moveX=1;
                             break;
                         case Keyboard::Up: 
-                            if(playerPosition.y >= 1) moveY=-1;
+                            if(playerPosition->y >= 1) moveY=-1;
                             break;
                         case Keyboard::Down: 
-                            if(playerPosition.y < tileCountH-1) moveY=1;
+                            if(playerPosition->y < tileCountH-1) moveY=1;
                             break;
                     }
-                playerPosition.x += moveX;
-                playerPosition.y += moveY;
+                playerPosition->x += moveX;
+                playerPosition->y += moveY;
                 if(testLog.reportPosition){
-                    std::cout << "Hop! Current Position: (" << playerPosition.x << "," << playerPosition.y << ")" << std::endl;
+                    std::cout << "Hop! Current Position: (" << playerPosition->x << "," << playerPosition->y << ")" << std::endl;
                 }
+                bool collision = Player.checkCollision(&enemy);
             }
         }
+
+        if(Player.checkCollision(&enemy)){
+            //std::cout << "Collision!" << std::endl;
+        }
+
         //Begin Draw
         window.clear();
         //--
-
-        fSprite.setPosition(playerPosition.x*tileSize,playerPosition.y*tileSize);
         
-        window.draw(fSprite);
+        pSprite->setPosition(playerPosition->x*tileSize,playerPosition->y*tileSize);
+        eSprite->setPosition(enemy.getPosition()->x*tileSize,enemy.getPosition()->y*tileSize);
+        window.draw(*eSprite);
+        window.draw(*pSprite);
 
         //End Draw
         window.display();
