@@ -39,6 +39,7 @@ struct Position{
         x = xpos;
         y = ypos;
     }
+
     void Update(int xpos, int ypos){
         if(grid[xpos][ypos]>0){
             grid[xpos][ypos] -= 1;
@@ -50,6 +51,10 @@ struct Position{
         std::stringstream ss;
         ss << "[" << x << "," << y << "]";
         return ss.str();
+    }
+    void Set(int intx,int inty){
+        x = intx;
+        y = inty;
     }
     int x, y;
 };
@@ -84,6 +89,10 @@ class GameEntity{
         mPosition.y = arr[1];
     }
 
+    void setPosition(Position pos){
+        mPosition.Set(pos.x,pos.y);
+    }
+
     Sprite* getSprite(){
         return &mSprite; 
     }
@@ -100,10 +109,28 @@ class GameEntity{
 
 class Enemy : public GameEntity{
     public:
+        
         Enemy():GameEntity(){}
         Enemy(string name, int pos[2], Texture* tex):GameEntity(name,pos,tex){}
+        Enemy(string name, int pos[2], Texture* tex, int direction, int spd) : Enemy(name,pos,tex){
+            dir = direction;
+            speed = spd;
+            startPosition.Set(pos[1],pos[2]);
+        }
+        Position startPosition;
         bool activeThreat = true;
+        int dir;
+        int speed;
+        void boundsCheck(){
+            int bounds;
+            dir > 0 ? bounds = (tileCountW * tileSize) + tileSize * 2 : bounds = -tileSize * 2;
+            if (abs(getPosition()->x)>abs(bounds)){
+                setPosition(startPosition);
+            }
+        }
 };
+
+Enemy enemyList[10];
 
 int main(){
 
