@@ -20,12 +20,11 @@ const int tileCountW = 13;
 
 const int tileCountH = 15;
 
-int grid[tileCountW][tileCountH]={0};
+int grid[tileCountW][tileCountH]={0}; //unimplemented -- potential option for collision
 
 int windowWidth = tileCountW * tileSize;
 int windowHeight = tileCountH * tileSize;
 
-//bool testMode = false;
 
 struct TestReporter{
     bool reportPosition = true;
@@ -39,7 +38,7 @@ struct Position{
         x = xpos;
         y = ypos;
     }
-
+    //unimplemented -- potential option for collision
     void Update(int xpos, int ypos){
         if(grid[xpos][ypos]>0){
             grid[xpos][ypos] -= 1;
@@ -63,9 +62,14 @@ class GameEntity{
     public:
         GameEntity(){};
 
-        GameEntity(string name, int position[2], Texture* tex){
+        GameEntity(string name, int position[2], Texture* tex){  //to be retired
             mName = name;
             mPosition=Position(position[0],position[1]);
+            mSprite = Sprite(*tex);
+        }
+        GameEntity(string name, std::vector<int> position, Texture* tex){ //to be retired
+            mName = name;
+            mPosition = Position(position.at(0),position.at(1));
             mSprite = Sprite(*tex);
         }
 
@@ -87,10 +91,18 @@ class GameEntity{
     void setPosition(int arr[2]){
         mPosition.x = arr[0];
         mPosition.y = arr[1];
+        getSprite()->setPosition(mPosition.x,mPosition.y);
+    }
+
+    void setPosition(std::vector<int> arr){
+        mPosition.x = arr[0];
+        mPosition.y = arr[1];
+        getSprite()->setPosition(mPosition.x,mPosition.y);
     }
 
     void setPosition(Position pos){
         mPosition.Set(pos.x,pos.y);
+        getSprite()->setPosition(mPosition.x,mPosition.y);
     }
 
     Sprite* getSprite(){
@@ -112,30 +124,43 @@ class Enemy : public GameEntity{
         
         Enemy():GameEntity(){}
         Enemy(string name, int pos[2], Texture* tex):GameEntity(name,pos,tex){}
-        Enemy(string name, int pos[2], Texture* tex, int direction, int spd) : Enemy(name,pos,tex){
+        Enemy(string name, std::vector<int> pos, Texture* tex, int direction, int spd) : Enemy(name,pos,tex){
             dir = direction;
             speed = spd;
-            startPosition.Set(pos[1],pos[2]);
+            startPosition.Set(pos[0],pos[1]);
+            if(dir<0){
+                startPosition.Set(tileCountW * tileSize, getPosition()->y);
+            } else {
+                startPosition.Set(-tileSize,getPosition()->y);
+            }
         }
+        Enemy(string name, std::vector<int> pos, Texture* tex):GameEntity(name,pos,tex){}
         Position startPosition;
         bool activeThreat = true;
         int dir;
-        int speed;
+        int speed = 1;
         void boundsCheck(){
-            int bounds;
-            dir > 0 ? bounds = (tileCountW * tileSize) + tileSize * 2 : bounds = -tileSize * 2;
-            if (abs(getPosition()->x)>abs(bounds)){
+            bool outOfBounds = false;
+            if(dir > 0){
+                if(getPosition()->x > (tileCountW * tileSize)+tileSize * 2) outOfBounds = true;
+            } else {
+                if(getPosition()->x < -tileSize * 2) outOfBounds = true;
+            }
+            if (outOfBounds){
                 setPosition(startPosition);
+                //std::cout << getName() << " is out of bounds!" << std::endl;
             }
         }
 };
 
-Enemy enemyList[10];
+
+
+int enemySpeed;
 
 int main(){
 
     TestReporter testLog;
-    int startPosition[2]{6,14};
+    int startPosition[2]{6,14}; //6,14 for bottom-middle
     Texture pTexture;
     pTexture.loadFromFile("images/frog.png");
     GameEntity Player("Player",startPosition,&pTexture);
@@ -143,14 +168,50 @@ int main(){
     Position* playerPosition = Player.getPosition();
     Sprite* pSprite = Player.getSprite();
 
-    int ePosition[2]{6,8};
-    string enemyName = "enemy";
-    Enemy enemy(enemyName,ePosition,&pTexture);
-    Position* enemyPosition = enemy.getPosition();
-    Sprite* eSprite = enemy.getSprite();
-    
+    int tickDelay = 5;
+    int tick = tickDelay;
+
+    Texture eTexture;
+    eTexture.loadFromFile("images/car.png");
+
+    Enemy enemyList[5][3] = { //Consider swapping to a vector so a jagged array can be made easily
+        {
+            {"5-1",std::vector<int>{(tileCountW-1) * tileSize, 9 * tileSize}, &eTexture, -1,3},
+            {"5-2",std::vector<int>{(tileCountW-4) * tileSize, 9 * tileSize}, &eTexture, -1,3},
+            {"5-3",std::vector<int>{(tileCountW-7) * tileSize, 9 * tileSize}, &eTexture, -1,3}
+        },
+        {
+            {"4-1",std::vector<int>{1 * tileSize, 10 * tileSize}, &eTexture,1,6},
+            {"4-2",std::vector<int>{4 * tileSize, 10 * tileSize}, &eTexture,1,6},
+            {"4-3",std::vector<int>{7 * tileSize, 10 * tileSize}, &eTexture,1,6}
+        },
+        {
+            {"3-1",std::vector<int>{(tileCountW-1) * tileSize, 11 * tileSize}, &eTexture, -1,4},
+            {"3-2",std::vector<int>{(tileCountW-4) * tileSize, 11 * tileSize}, &eTexture, -1,4},
+            {"3-3",std::vector<int>{(tileCountW-7) * tileSize, 11 * tileSize}, &eTexture, -1,4}
+        },
+        { 
+            {"2-1",std::vector<int>{1 * tileSize, 12 * tileSize}, &eTexture,1,5},
+            {"2-2",std::vector<int>{4 * tileSize, 12 * tileSize}, &eTexture,1,5},
+            {"2-3",std::vector<int>{7 * tileSize, 12 * tileSize}, &eTexture,1,5}
+        },
+        {
+            {"1-1", std::vector<int>{(tileCountW-1) * tileSize, 13 * tileSize}, &eTexture, -1, 2},
+            {"1-2", std::vector<int>{(tileCountW-4) * tileSize, 13 * tileSize}, &eTexture, -1, 2},
+            {"1-3", std::vector<int>{(tileCountW-7) * tileSize, 13 * tileSize}, &eTexture, -1, 2}
+        }
+    };
+
+    for(int i=0;i<5;i++){
+        for(int j=0; j<3; j++){
+            if(enemyList[i][j].dir>0){
+                enemyList[i][j].getSprite()->setScale(-1,1);
+            }
+        }
+    }
 
     RenderWindow window(VideoMode(windowWidth,windowHeight),"Totally Not That Other Frog Game");
+    window.setFramerateLimit(60);
     while(window.isOpen()){
         int moveX, moveY;
         moveX = moveY = 0;
@@ -181,21 +242,36 @@ int main(){
                 if(testLog.reportPosition){
                     std::cout << "Hop! Current Position: (" << playerPosition->x << "," << playerPosition->y << ")" << std::endl;
                 }
-                bool collision = Player.checkCollision(&enemy);
             }
         }
-
-        if(Player.checkCollision(&enemy)){
-            //std::cout << "Collision!" << std::endl;
-        }
+        if(tick <= 0){
+            for(int i = 0;i < 5; i++){
+                for (int j=0; j < 3; j++){
+                    Enemy * e = &enemyList[i][j];
+                    Position newPos(e->getPosition()->x + (e->speed * e->dir),e->getPosition()->y);
+                    e->setPosition(newPos);
+                    e->boundsCheck();
+                    //e->checkCollision(&Player);
+                }
+            }
+        tick = tickDelay;
+      }
+      tick -= 1;
 
         //Begin Draw
         window.clear();
         //--
         
+        for(int i = 0; i < 5; i++){
+            for (int j=0; j<3; j++){
+                Enemy * e = &enemyList[i][j];
+                //std::cout << "Enemy drawn at:" << enemyList[i][j].getPosition()->Print() << "Current Speed" << enemyList[i][j].speed << std::endl;
+                window.draw(*e->getSprite());
+            }
+        }
+
         pSprite->setPosition(playerPosition->x*tileSize,playerPosition->y*tileSize);
-        eSprite->setPosition(enemy.getPosition()->x*tileSize,enemy.getPosition()->y*tileSize);
-        window.draw(*eSprite);
+
         window.draw(*pSprite);
 
         //End Draw
