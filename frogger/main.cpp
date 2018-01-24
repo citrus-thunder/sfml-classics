@@ -174,31 +174,59 @@ int main(){
     Texture eTexture;
     eTexture.loadFromFile("images/car.png");
 
-    Enemy enemyList[5][3] = { //Consider swapping to a vector so a jagged array can be made easily
+    Enemy enemyList[5][3] { //Consider swapping to a vector so a jagged array can be made easily
         {
-            {"5-1",std::vector<int>{(tileCountW-1) * tileSize, 9 * tileSize}, &eTexture, -1,3},
-            {"5-2",std::vector<int>{(tileCountW-4) * tileSize, 9 * tileSize}, &eTexture, -1,3},
-            {"5-3",std::vector<int>{(tileCountW-7) * tileSize, 9 * tileSize}, &eTexture, -1,3}
+            {"E5-1",std::vector<int>{(tileCountW-1) * tileSize, 9 * tileSize}, &eTexture, -1,3},
+            {"E5-2",std::vector<int>{(tileCountW-4) * tileSize, 9 * tileSize}, &eTexture, -1,3},
+            {"E5-3",std::vector<int>{(tileCountW-7) * tileSize, 9 * tileSize}, &eTexture, -1,3}
         },
         {
-            {"4-1",std::vector<int>{1 * tileSize, 10 * tileSize}, &eTexture,1,6},
-            {"4-2",std::vector<int>{4 * tileSize, 10 * tileSize}, &eTexture,1,6},
-            {"4-3",std::vector<int>{7 * tileSize, 10 * tileSize}, &eTexture,1,6}
+            {"E4-1",std::vector<int>{1 * tileSize, 10 * tileSize}, &eTexture,1,6},
+            {"E4-2",std::vector<int>{4 * tileSize, 10 * tileSize}, &eTexture,1,6},
+            {"E4-3",std::vector<int>{7 * tileSize, 10 * tileSize}, &eTexture,1,6}
         },
         {
-            {"3-1",std::vector<int>{(tileCountW-1) * tileSize, 11 * tileSize}, &eTexture, -1,4},
-            {"3-2",std::vector<int>{(tileCountW-4) * tileSize, 11 * tileSize}, &eTexture, -1,4},
-            {"3-3",std::vector<int>{(tileCountW-7) * tileSize, 11 * tileSize}, &eTexture, -1,4}
+            {"E3-1",std::vector<int>{(tileCountW-1) * tileSize, 11 * tileSize}, &eTexture, -1,4},
+            {"E3-2",std::vector<int>{(tileCountW-4) * tileSize, 11 * tileSize}, &eTexture, -1,4},
+            {"E3-3",std::vector<int>{(tileCountW-7) * tileSize, 11 * tileSize}, &eTexture, -1,4}
         },
         { 
-            {"2-1",std::vector<int>{1 * tileSize, 12 * tileSize}, &eTexture,1,5},
-            {"2-2",std::vector<int>{4 * tileSize, 12 * tileSize}, &eTexture,1,5},
-            {"2-3",std::vector<int>{7 * tileSize, 12 * tileSize}, &eTexture,1,5}
+            {"E2-1",std::vector<int>{1 * tileSize, 12 * tileSize}, &eTexture,1,5},
+            {"E2-2",std::vector<int>{4 * tileSize, 12 * tileSize}, &eTexture,1,5},
+            {"E2-3",std::vector<int>{7 * tileSize, 12 * tileSize}, &eTexture,1,5}
         },
         {
-            {"1-1", std::vector<int>{(tileCountW-1) * tileSize, 13 * tileSize}, &eTexture, -1, 2},
-            {"1-2", std::vector<int>{(tileCountW-4) * tileSize, 13 * tileSize}, &eTexture, -1, 2},
-            {"1-3", std::vector<int>{(tileCountW-7) * tileSize, 13 * tileSize}, &eTexture, -1, 2}
+            {"E1-1", std::vector<int>{(tileCountW-1) * tileSize, 13 * tileSize}, &eTexture, -1, 2},
+            {"E1-2", std::vector<int>{(tileCountW-4) * tileSize, 13 * tileSize}, &eTexture, -1, 2},
+            {"E1-3", std::vector<int>{(tileCountW-7) * tileSize, 13 * tileSize}, &eTexture, -1, 2}
+        }
+    };
+
+    Enemy platformList[5][3] { 
+        {
+            {"P5-1",std::vector<int>{(tileCountW-1) * tileSize, 3 * tileSize}, &eTexture, -1,3},
+            {"P5-2",std::vector<int>{(tileCountW-4) * tileSize, 3 * tileSize}, &eTexture, -1,3},
+            {"P5-3",std::vector<int>{(tileCountW-7) * tileSize, 3 * tileSize}, &eTexture, -1,3}
+        },
+        {
+            {"P4-1",std::vector<int>{1 * tileSize, 4 * tileSize}, &eTexture,1,6},
+            {"P4-2",std::vector<int>{4 * tileSize, 4 * tileSize}, &eTexture,1,6},
+            {"P4-3",std::vector<int>{7 * tileSize, 4 * tileSize}, &eTexture,1,6}
+        },
+        {
+            {"P3-1",std::vector<int>{(tileCountW-1) * tileSize, 5 * tileSize}, &eTexture, -1,4},
+            {"P3-2",std::vector<int>{(tileCountW-4) * tileSize, 5 * tileSize}, &eTexture, -1,4},
+            {"P3-3",std::vector<int>{(tileCountW-7) * tileSize, 5 * tileSize}, &eTexture, -1,4}
+        },
+        { 
+            {"P2-1",std::vector<int>{1 * tileSize, 6 * tileSize}, &eTexture,1,5},
+            {"P2-2",std::vector<int>{4 * tileSize, 6 * tileSize}, &eTexture,1,5},
+            {"P2-3",std::vector<int>{7 * tileSize, 6 * tileSize}, &eTexture,1,5}
+        },
+        {
+            {"P1-1", std::vector<int>{(tileCountW-1) * tileSize, 7 * tileSize}, &eTexture, -1, 2},
+            {"P1-2", std::vector<int>{(tileCountW-4) * tileSize, 7 * tileSize}, &eTexture, -1, 2},
+            {"P1-3", std::vector<int>{(tileCountW-7) * tileSize, 7 * tileSize}, &eTexture, -1, 2}
         }
     };
 
@@ -206,6 +234,9 @@ int main(){
         for(int j=0; j<3; j++){
             if(enemyList[i][j].dir>0){
                 enemyList[i][j].getSprite()->setScale(-1,1);
+            }
+            if(platformList[i][j].dir>0){
+                platformList[i][j].getSprite()->setScale(-1,1);
             }
         }
     }
@@ -250,7 +281,14 @@ int main(){
                     Enemy * e = &enemyList[i][j];
                     Position newPos(e->getPosition()->x + (e->speed * e->dir),e->getPosition()->y);
                     e->setPosition(newPos);
+
+                    Enemy * p = &platformList[i][j];
+                    Position PnewPos(p->getPosition()->x + (p->speed * p->dir),p->getPosition()->y);
+                    p->setPosition(PnewPos);
+
+
                     e->boundsCheck();
+                    p->boundsCheck();
                     if(e->checkCollision(&Player)) Player.setPosition(startPosition); //expensive collision check. todo-- switch to only check against enemies in current row
                 }
             }
@@ -266,6 +304,9 @@ int main(){
             for (int j=0; j<3; j++){
                 Enemy * e = &enemyList[i][j];
                 window.draw(*e->getSprite());
+
+                Enemy * p = &platformList[i][j];
+                window.draw(*p->getSprite());
             }
         }
 
