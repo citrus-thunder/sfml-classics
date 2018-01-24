@@ -20,8 +20,6 @@ const int tileCountW = 13;
 
 const int tileCountH = 15;
 
-int grid[tileCountW][tileCountH]={0}; //unimplemented -- potential option for collision
-
 int windowWidth = tileCountW * tileSize;
 int windowHeight = tileCountH * tileSize;
 
@@ -38,24 +36,19 @@ struct Position{
         x = xpos;
         y = ypos;
     }
-    //unimplemented -- potential option for collision
-    void Update(int xpos, int ypos){
-        if(grid[xpos][ypos]>0){
-            grid[xpos][ypos] -= 1;
-        } else {
-
-        }
-    }
     string Print(){
         std::stringstream ss;
         ss << "[" << x << "," << y << "]";
         return ss.str();
     }
+
     void Set(int intx,int inty){
         x = intx;
         y = inty;
     }
     int x, y;
+    int basis=1;
+    bool isAbstract;
 };
 
 class GameEntity{
@@ -290,6 +283,8 @@ int main(){
                     e->boundsCheck();
                     p->boundsCheck();
                     if(e->checkCollision(&Player)) Player.setPosition(startPosition); //expensive collision check. todo-- switch to only check against enemies in current row
+                    if(p->checkCollision(&Player)) Player.setPosition(std::vector<int>{(Player.getPosition()->x/tileSize)+(p->dir*p->speed),Player.getPosition()->y});
+                    //if(p->checkCollision(&Player)) Player.setPosition(*p->getPosition());
                 }
             }
         tick = tickDelay;
