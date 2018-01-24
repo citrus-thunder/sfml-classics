@@ -251,7 +251,7 @@ int main(){
                     Position newPos(e->getPosition()->x + (e->speed * e->dir),e->getPosition()->y);
                     e->setPosition(newPos);
                     e->boundsCheck();
-                    //e->checkCollision(&Player);
+                    if(e->checkCollision(&Player)) Player.setPosition(startPosition); //expensive collision check. todo-- switch to only check against enemies in current row
                 }
             }
         tick = tickDelay;
@@ -265,12 +265,11 @@ int main(){
         for(int i = 0; i < 5; i++){
             for (int j=0; j<3; j++){
                 Enemy * e = &enemyList[i][j];
-                //std::cout << "Enemy drawn at:" << enemyList[i][j].getPosition()->Print() << "Current Speed" << enemyList[i][j].speed << std::endl;
                 window.draw(*e->getSprite());
             }
         }
 
-        pSprite->setPosition(playerPosition->x*tileSize,playerPosition->y*tileSize);
+        pSprite->setPosition(playerPosition->x*tileSize,playerPosition->y*tileSize); //translate "local" position to pixel position
 
         window.draw(*pSprite);
 
